@@ -60,7 +60,7 @@ function DepartmentVisual({ type }) {
 }
 
 export function Departments() {
-  return <section className="departments" id="departments" data-section="Acts" aria-label="Our departments"><div className="department-track" id="department-track">{departments.map((dept, i) => <article className="department" data-bg={dept.color} style={{ "--accent": dept.accent }} key={dept.title}><span className="dept-number">0{i + 1}</span><div className="dept-label"><span className="eyebrow">{dept.act}</span></div><div className="dept-content"><h2 className="dept-title">{dept.title}</h2><p className="dept-copy">{dept.copy}</p><div className="chips">{dept.chips.map(chip => <span className="chip" key={chip}>{chip}</span>)}</div></div><div className="dept-visual"><DepartmentVisual type={dept.visual} /></div></article>)}</div></section>;
+  return <section className="departments" id="departments" data-section="Acts" aria-label="Our departments"><div className="department-track" id="department-track">{departments.map((dept, i) => <article className="department" data-bg={dept.color} style={{ "--accent": dept.accent }} key={dept.title}><span className="dept-number">0{i + 1}</span><div className="dept-label"><span className="eyebrow">{dept.act}</span></div><div className="dept-content"><h2 className={`dept-title dept-title-${dept.visual}`}>{dept.title}</h2><p className="dept-copy">{dept.copy}</p><div className="chips">{dept.chips.map(chip => <span className="chip" key={chip}>{chip}</span>)}</div></div><div className="dept-visual"><DepartmentVisual type={dept.visual} /></div></article>)}</div></section>;
 }
 
 export function Events() {

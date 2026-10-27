@@ -2236,24 +2236,6 @@ button {
   min-height: 1em
 }
 
-.turnstile-wrap {
-  grid-column: 1/-1;
-  display: grid;
-  gap: 8px
-}
-
-.turnstile-field {
-  min-height: 65px
-}
-
-.turnstile-error,
-.turnstile-wrap>.error {
-  margin: 0;
-  color: #ff9188;
-  font-size: .7rem;
-  min-height: 1em
-}
-
 .department-field {
   border: 0;
   margin: 8px 0 2px;
@@ -2913,6 +2895,11 @@ button {
   .dept-title {
     font-size: clamp(2.8rem, 14vw, 4.8rem);
     margin-bottom: 14px;
+  }
+
+  .dept-title-communication {
+    font-size: clamp(1.9rem, 9.5vw, 3.5rem);
+    letter-spacing: -.055em;
   }
 
   .dept-visual {

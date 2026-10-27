@@ -2236,6 +2236,24 @@ button {
   min-height: 1em
 }
 
+.turnstile-wrap {
+  grid-column: 1/-1;
+  display: grid;
+  gap: 8px
+}
+
+.turnstile-field {
+  min-height: 65px
+}
+
+.turnstile-error,
+.turnstile-wrap>.error {
+  margin: 0;
+  color: #ff9188;
+  font-size: .7rem;
+  min-height: 1em
+}
+
 .department-field {
   border: 0;
   margin: 8px 0 2px;

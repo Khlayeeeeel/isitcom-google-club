@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { gsap } from "gsap";
 import { submitClubApplication } from "../lib/supabaseRest";
+import Turnstile from "./Turnstile";
 
 const initialValues = { name: "", email: "", year: "", field: "", department: "", motivation: "", website: "" };
+const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY?.trim();
 
 function confetti() {
   const colors = ["#4285f4", "#ea4335", "#fbbc05", "#34a853"];
@@ -21,6 +23,8 @@ export default function JoinForm() {
   const [success, setSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileResetKey, setTurnstileResetKey] = useState(0);
   const update = event => {
     const { name, value } = event.target;
     setValues(current => ({ ...current, [name]: value }));
@@ -37,6 +41,7 @@ export default function JoinForm() {
     if (!values.field.trim()) next.field = "This field is required.";
     if (!values.department) next.department = "Choose a department.";
     if (values.motivation.trim() && values.motivation.trim().length < 20) next.motivation = "Tell us a little more — at least 20 characters.";
+    if (!turnstileToken) next.turnstile = "Complete the security check.";
     setErrors(next);
     return Object.keys(next).length === 0;
   };
@@ -51,11 +56,13 @@ export default function JoinForm() {
     setIsSubmitting(true);
     setSubmitError("");
     try {
-      await submitClubApplication(values);
+      await submitClubApplication(values, turnstileToken);
       setSuccess(true);
       confetti();
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : "We could not send your application. Please try again.");
+      setTurnstileToken("");
+      setTurnstileResetKey(current => current + 1);
     } finally {
       setIsSubmitting(false);
     }
@@ -71,7 +78,8 @@ export default function JoinForm() {
     {field("field", "Field of study", <input id="field" name="field" placeholder="e.g. Computer Science" maxLength={160} value={values.field} onChange={update} aria-invalid={Boolean(errors.field)} aria-describedby="field-error" />)}
     <fieldset className="department-field"><legend>Where do you want to contribute?</legend><div className="dept-options">{[["Technical", "Grow", "var(--blue)"], ["Marketing", "Create", "var(--red)"], ["Communication", "Inspire", "var(--yellow)"]].map(([name, act, color]) => <div className="dept-choice" key={name}><input type="radio" id={`choice-${name.toLowerCase()}`} name="department" value={name} checked={values.department === name} onChange={update} aria-invalid={Boolean(errors.department)} /><label htmlFor={`choice-${name.toLowerCase()}`} style={{ "--choice": color }}>{name} · {act}</label></div>)}</div><span className="error" id="department-error">{errors.department || ""}</span></fieldset>
     {field("motivation", "What do you want to learn or make? (Optional)", <textarea id="motivation" name="motivation" maxLength={5000} value={values.motivation} onChange={update} aria-invalid={Boolean(errors.motivation)} aria-describedby="motivation-error" placeholder="Tell us what sparks your curiosity..." />)}
+    <div className="turnstile-wrap"><Turnstile siteKey={turnstileSiteKey} resetKey={turnstileResetKey} onToken={token => { setTurnstileToken(token); if (token) setErrors(current => ({ ...current, turnstile: "" })); }} /><span className="error" id="turnstile-error">{errors.turnstile || ""}</span></div>
     {submitError && <p className="form-submit-error" role="alert">{submitError}</p>}
     <div className="submit-row"><span className="form-status" aria-live="polite">{isSubmitting ? "Sending your application…" : "Your application is sent securely."}</span><button className="button magnetic" type="submit" data-cursor="Join" disabled={isSubmitting}>{isSubmitting ? "Sending…" : "Send application"} <span className="button-arrow">↗</span></button></div>
-  </div> : <div className="form-success show" aria-live="polite"><div><div className="success-check">✓</div><h3>Application received.</h3><p>Thank you for applying. The club team will review your application.</p><button className="button" type="button" onClick={() => { setSuccess(false); setValues(initialValues); setErrors({}); setSubmitError(""); }}>Submit another application</button></div></div>}</form></div></section>;
+  </div> : <div className="form-success show" aria-live="polite"><div><div className="success-check">✓</div><h3>Application received.</h3><p>Thank you for applying. The club team will review your application.</p><button className="button" type="button" onClick={() => { setSuccess(false); setValues(initialValues); setErrors({}); setSubmitError(""); setTurnstileToken(""); setTurnstileResetKey(current => current + 1); }}>Submit another application</button></div></div>}</form></div></section>;
 }

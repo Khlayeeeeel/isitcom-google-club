@@ -31,6 +31,8 @@ The publishable key is designed for browser use. Never use a Supabase secret or 
 
 Run `supabase/migrations/20261027122000_simplify_public_registration.sql` in the Supabase SQL editor, then redeploy the site.
 
+If the registration table already existed, also run `supabase/migrations/20261027123000_enforce_optional_motivation.sql` so the final textarea accepts an empty value.
+
 ## Project structure
 
 - `src/data.js` — editable club content, events, departments, team and statistics

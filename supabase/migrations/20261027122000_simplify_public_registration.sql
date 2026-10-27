@@ -1,5 +1,20 @@
 begin;
 
+-- Motivation is genuinely optional. Empty input is normalized to NULL by the
+-- RPC, and the table accepts NULL while still bounding non-empty responses.
+alter table public.club_applications
+  alter column motivation drop not null;
+
+alter table public.club_applications
+  drop constraint if exists club_applications_motivation_length;
+
+alter table public.club_applications
+  add constraint club_applications_motivation_length
+  check (
+    motivation is null
+    or char_length(btrim(motivation)) between 20 and 5000
+  );
+
 -- Keep the public registration flow simple: the browser may execute only this
 -- validated, rate-limited RPC. Direct table access remains denied.
 create or replace function public.submit_club_application(
